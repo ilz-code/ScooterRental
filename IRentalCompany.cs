@@ -1,10 +1,12 @@
-﻿namespace ScooterRental
+﻿using System.Collections.Generic;
+
+namespace ScooterRental
 {
     public interface IRentalCompany
     {
         string Name { get; }
-        void StartRent(Scooter scooter);
+        List<Payment> StartRent(Scooter scooter);
         decimal EndRent(Scooter scooter);
-        decimal CalculateIncome(int? year, bool includeNotCompletedRentals);
+        decimal CalculateIncome(List<Payment> payments, int? year, bool includeNotCompletedRentals);
     }
 }

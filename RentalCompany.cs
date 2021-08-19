@@ -8,18 +8,19 @@ namespace ScooterRental
 {
     public class RentalCompany : IRentalCompany
     {
-       public string Name { get; }
-       public List<Payment> payments = new List<Payment>();
+        public string Name { get; }
+        public List<Payment> payments = new List<Payment>();
 
-       public RentalCompany(string name)
-       {
-           Name = name;
-       }
+        public RentalCompany(string name)
+        {
+            Name = name;
+        }
 
-       public void StartRent(Scooter scooter)
-       {
-           payments.Add(new Payment(scooter.Id, scooter.TimeStart, scooter.PricePerMinute));
-       }
+        public List<Payment> StartRent(Scooter scooter)
+        {
+            payments.Add(new Payment(scooter.Id, scooter.TimeStart, scooter.PricePerMinute));
+            return payments;
+        }
 
         public decimal EndRent(Scooter scooter)
         {
@@ -32,41 +33,64 @@ namespace ScooterRental
                     payment.SumPay = pay;
                 }
             }
-            
+
             return pay;
         }
 
-        public decimal CalculateIncome(int? year, bool includeNotCompletedRentals)
+        public decimal CalculateIncome(List<Payment> payments, int? year, bool includeNotCompletedRentals)
         {
             decimal income = 0;
-            foreach (Payment payment in payments)
+
+            if (includeNotCompletedRentals == false)
             {
-                int? year1 = payment.EndTime.Year;
-                if (year1==year)
+                if (year == null)
                 {
-                    income += payment.SumPay;
+                    income = (decimal)payments.Sum(payment => payment.SumPay);
+                }
+
+                else
+                {
+                    foreach (Payment payment in payments)
+                    {
+                        if (payment.EndTime.Year == year)
+                            income += payment.SumPay;
+                    }
                 }
             }
 
             if (includeNotCompletedRentals == true)
             {
-                foreach (Payment payment in payments)
+                if (year == null)
                 {
-                    if (payment.EndTime.Year != year)
+                    income = (decimal)payments.Sum(payment => payment.SumPay);
+                    foreach (Payment payment in payments)
                     {
-                        income += CalculatePay(payment.StartTime, DateTime.Now, payment.PricePerMinute);
+                        if (payment.EndTime.Year == 1)
+                        {
+                            DateTime endTime = DateTime.Parse($"{payment.StartTime.Year + 1}-01-01 00:00:00");
+                            income += CalculatePay(payment.StartTime, endTime, payment.PricePerMinute);
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (Payment payment in payments)
+                    {
+                        if (payment.StartTime.Year == year)
+                        {
+                            if (payment.EndTime.Year == year)
+                            {
+                                income += payment.SumPay;
+                            }
+                            else
+                            {
+                                payment.EndTime = DateTime.Parse($"{payment.StartTime.Year + 1}-01-01 00:00:00");
+                                income += CalculatePay(payment.StartTime, payment.EndTime, payment.PricePerMinute);
+                            }
+                        }
                     }
                 }
             }
-
-            if (year == null)
-            {
-                foreach (Payment payment in payments)
-                {
-                    income += payment.SumPay;
-                }
-            }
-
             return income;
         }
 

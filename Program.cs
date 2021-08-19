@@ -12,6 +12,7 @@ namespace ScooterRental
     {
         public static ScooterService Service = new ScooterService("City scooters");
         public static RentalCompany Rental = new RentalCompany("City scooters");
+        public static List<Payment> payments = new List<Payment>();
 
         static void Main(string[] args)
         {
@@ -108,7 +109,7 @@ namespace ScooterRental
             int year = int.Parse(Console.ReadLine());
             Console.WriteLine("Include not completed rentals? (y/n)");
             bool notCompletedRentals = (Console.ReadLine() == "y") ? true : false;
-            Console.WriteLine(Rental.CalculateIncome(year, notCompletedRentals));
+            Console.WriteLine(Rental.CalculateIncome(payments, year, notCompletedRentals));
         }
     }
 }

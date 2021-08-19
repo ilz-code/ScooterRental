@@ -33,11 +33,20 @@ namespace ScooterRental
 
         public void RemoveScooter(string id)
         {
-            for (int i = 0; i < scooters.Count; i++)
+            Scooter scooter = GetScooterById(id);
+            try
             {
-                if (scooters[i].Id == id && scooters[i].IsRented == false)
-                    scooters.Remove(scooters[i]);
+                scooters.Remove(scooter);
             }
+            catch (Exception e) 
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            //if (scooter.IsRented == false)
+            //    scooters.Remove(scooter);
+            //else 
+            //    Console.WriteLine("This scooter is rented out now");
         }
 
         public IList<Scooter> GetScooters()
@@ -47,13 +56,7 @@ namespace ScooterRental
 
         public Scooter GetScooterById(string scooterId)
         {
-            Scooter scooter = null;
-            for (int i = 0; i < scooters.Count; i++)
-            {
-                if (scooters[i].Id == scooterId)
-                    scooter = scooters[i];
-            }
-
+            Scooter scooter = scooters.Find(sc => sc.Id ==scooterId);
             return scooter;
         }
 
@@ -61,10 +64,9 @@ namespace ScooterRental
         {
             Scooter scooter = GetScooterById(id);
             if (scooter.IsRented == false)
-            {
                 scooter.IsRented = true;
-            }
-            else Console.WriteLine("This scooter is not available");
+            else 
+                Console.WriteLine("This scooter is not available");
 
             return scooter;
         }
