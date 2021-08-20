@@ -14,7 +14,7 @@ namespace ScooterRental
         {
             Name = name;
         }
-        
+
         public void AddScooter(string id, decimal pricePerMinute)
         {
             if (id == "scooters")
@@ -37,29 +37,21 @@ namespace ScooterRental
         public void RemoveScooter(string id)
         {
             Scooter scooter = GetScooterById(id);
-            try
-            {
+
+            if (scooter.IsRented)
+                throw new Exception("Scooter is rented.");
+            else
                 scooters.Remove(scooter);
-            }
-            catch (Exception e) 
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-            //if (scooter.IsRented == false)
-            //    scooters.Remove(scooter);
-            //else 
-            //    Console.WriteLine("This scooter is rented out now");
         }
 
         public IList<Scooter> GetScooters()
-            {
-                return scooters;
-            }
+        {
+            return scooters;
+        }
 
         public Scooter GetScooterById(string scooterId)
         {
-            Scooter scooter = scooters.Find(sc => sc.Id ==scooterId);
+            Scooter scooter = scooters.Find(sc => sc.Id == scooterId);
             return scooter;
         }
     }

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ScooterRental
 {
@@ -24,11 +20,9 @@ namespace ScooterRental
         {
             Scooter scooter = Service.GetScooterById(id);
             if (scooter.IsRented)
-                throw new Exception("Šcooter is rented.");
-            if (scooter.IsRented == false)
-                scooter.IsRented = true;
+                throw new Exception("Scooter is rented.");
             else
-                Console.WriteLine("This scooter is not available");
+                scooter.IsRented = true;
         }
         
         public decimal EndRent(string id)

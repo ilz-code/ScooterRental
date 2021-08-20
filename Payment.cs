@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 
 namespace ScooterRental
 {
@@ -18,8 +16,5 @@ namespace ScooterRental
             StartTime = timeS;
             PricePerMinute = pricePerMinute;
         }
-
-       
-
     }
 }

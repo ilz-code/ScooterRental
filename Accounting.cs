@@ -27,7 +27,7 @@ namespace ScooterRental
             Payments.Add(payment);
         }
 
-        public decimal EndRenting(string id, DateTime time) //, List<Payment> Payments
+        public decimal EndRenting(string id, DateTime time) 
         {
             Payment payment = Payments.Find(p => p.Id == id);
             payment.EndTime = time;
@@ -127,7 +127,7 @@ namespace ScooterRental
             List<Payment> payments = new List<Payment>();
             var text = File.ReadAllText($"..\\..\\{fileName}.txt");
             string[] lines = text.Split('\n');
-            for (int i = 0; i < lines.Length; i++)
+            for (int i = 0; i <3 ; i++) //lines.Length
             {
                 string[] words = lines[i].Split(' ');
                 DateTime time = DateTime.Parse(words[1] + " " + words[2]);
