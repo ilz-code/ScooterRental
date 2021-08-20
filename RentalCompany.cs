@@ -9,110 +9,40 @@ namespace ScooterRental
     public class RentalCompany : IRentalCompany
     {
         public string Name { get; }
-        public List<Payment> payments = new List<Payment>();
 
-        public RentalCompany(string name)
+        public IScooterService Service;
+        public Accounting Account;
+
+        public RentalCompany(string name, IScooterService service, Accounting account)
         {
+            Account = account;
+            Service = service;
             Name = name;
         }
 
-        public List<Payment> StartRent(Scooter scooter)
+        public void StartRent(string id)
         {
-            payments.Add(new Payment(scooter.Id, scooter.TimeStart, scooter.PricePerMinute));
-            return payments;
+            Scooter scooter = Service.GetScooterById(id);
+            if (scooter.IsRented)
+                throw new Exception("Šcooter is rented.");
+            if (scooter.IsRented == false)
+                scooter.IsRented = true;
+            else
+                Console.WriteLine("This scooter is not available");
         }
-
-        public decimal EndRent(Scooter scooter)
+        
+        public decimal EndRent(string id)
         {
-            decimal pay = CalculatePay(scooter.TimeStart, scooter.TimeEnd, scooter.PricePerMinute);
-            foreach (Payment payment in payments)
-            {
-                if (payment.Id == scooter.Id)
-                {
-                    payment.EndTime = scooter.TimeEnd;
-                    payment.SumPay = pay;
-                }
-            }
-
+            Scooter scooter = Service.GetScooterById(id);
+            scooter.IsRented = false;
+            decimal pay = Account.GetPay(id);
             return pay;
         }
 
-        public decimal CalculateIncome(List<Payment> payments, int? year, bool includeNotCompletedRentals)
+        public decimal CalculateIncome(int? year, bool includeNotCompletedRentals)
         {
-            decimal income = 0;
-
-            if (includeNotCompletedRentals == false)
-            {
-                if (year == null)
-                {
-                    income = (decimal)payments.Sum(payment => payment.SumPay);
-                }
-
-                else
-                {
-                    foreach (Payment payment in payments)
-                    {
-                        if (payment.EndTime.Year == year)
-                            income += payment.SumPay;
-                    }
-                }
-            }
-
-            if (includeNotCompletedRentals == true)
-            {
-                if (year == null)
-                {
-                    income = (decimal)payments.Sum(payment => payment.SumPay);
-                    foreach (Payment payment in payments)
-                    {
-                        if (payment.EndTime.Year == 1)
-                        {
-                            DateTime endTime = DateTime.Parse($"{payment.StartTime.Year + 1}-01-01 00:00:00");
-                            income += CalculatePay(payment.StartTime, endTime, payment.PricePerMinute);
-                        }
-                    }
-                }
-                else
-                {
-                    foreach (Payment payment in payments)
-                    {
-                        if (payment.StartTime.Year == year)
-                        {
-                            if (payment.EndTime.Year == year)
-                            {
-                                income += payment.SumPay;
-                            }
-                            else
-                            {
-                                payment.EndTime = DateTime.Parse($"{payment.StartTime.Year + 1}-01-01 00:00:00");
-                                income += CalculatePay(payment.StartTime, payment.EndTime, payment.PricePerMinute);
-                            }
-                        }
-                    }
-                }
-            }
+            decimal income = Account.CalculatingIncome(year, includeNotCompletedRentals);
             return income;
-        }
-
-        public decimal CalculatePay(DateTime startTime, DateTime endTime, decimal pricePerMinute)
-        {
-            decimal minutes = (decimal)(endTime - startTime).TotalMinutes;
-            decimal pay = Math.Round(minutes * pricePerMinute, 2);
-            if (pay > 20)
-            {
-                decimal firstDay = (decimal)(startTime.AddDays(1).Date - startTime)
-                    .TotalMinutes * pricePerMinute;
-                if (firstDay > 20)
-                    firstDay = 20;
-                decimal lastDay = (decimal)(endTime - endTime.Date)
-                    .TotalMinutes * pricePerMinute;
-                if (lastDay > 20)
-                    lastDay = 20;
-                decimal fullDays = (decimal)((endTime.Date - startTime.Date)
-                    .TotalDays - 1) * 20;
-                pay = Math.Round(firstDay + fullDays + lastDay, 2);
-            }
-            return pay;
         }
     }
 }

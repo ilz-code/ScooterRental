@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace ScooterRental
 {
     public class Payment
-    {
+    { 
         public string Id;
         public DateTime StartTime;
         public DateTime EndTime;
@@ -16,6 +18,8 @@ namespace ScooterRental
             StartTime = timeS;
             PricePerMinute = pricePerMinute;
         }
-        
+
+       
+
     }
 }
