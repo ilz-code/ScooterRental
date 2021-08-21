@@ -10,43 +10,48 @@ namespace ScooterRental
         public static Accounting Account = new Accounting(Payments);
         public static IRentalCompany Rental = new RentalCompany("City scooters", Service, Account);
 
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            string choise;
-            do
-            {
-                Console.WriteLine("\n Choose what to do:" +
-                                  "\n Add scooter - 1" +
-                                  "\n Remove scooter - 2" +
-                                  "\n Rent scooter - 3" +
-                                  "\n Return scooter - 4" +
-                                  "\n Calculate income - 5" +
-                                  "\n End work - 0");
-                choise = Console.ReadLine();
-
-                switch (choise)
-                {
-                    case "1":
-                        AddingScooter();
-                        break;
-                    case "2":
-                        RemovingScooter();
-                        break;
-                    case "3":
-                        RentingScooter();
-                        break;
-                    case "4":
-                        ReturningScooter();
-                        break;
-                    case "5":
-                        CalculatingIncome();
-                        break;
-                    case "0":
-                        return;
-                }
-            } while (choise != "0");
-
+            MakeChoise();
         }
+
+        public static void MakeChoise()
+            {
+                string choise;
+                do
+                {
+                    Console.WriteLine("\n Choose what to do:" +
+                                      "\n Add scooter - 1" +
+                                      "\n Remove scooter - 2" +
+                                      "\n Rent scooter - 3" +
+                                      "\n Return scooter - 4" +
+                                      "\n Calculate income - 5" +
+                                      "\n End work - 0");
+                    choise = Console.ReadLine();
+
+                    switch (choise)
+                    {
+                        case "1":
+                            AddingScooter();
+                            break;
+                        case "2":
+                            RemovingScooter();
+                            break;
+                        case "3":
+                            RentingScooter();
+                            break;
+                        case "4":
+                            ReturningScooter();
+                            break;
+                        case "5":
+                            CalculatingIncome();
+                            break;
+                        case "0":
+                            return;
+                    }
+                } while (choise != "0");
+            }
+        
 
         public static void AddingScooter()
         {
@@ -80,8 +85,9 @@ namespace ScooterRental
             string id = Console.ReadLine();
             Console.WriteLine("Enter time (yyyy-mm-dd hh:mm:ss)");
             DateTime time = DateTime.Parse(Console.ReadLine());
-            decimal pay = Account.EndRenting(id, time);
-            Console.WriteLine($"\n Calculated payment: {pay}"); //{Rental.EndRent(id)}");
+            Account.EndRenting(id, time);
+            decimal pay = Rental.EndRent(id); 
+            Console.WriteLine($"\n Calculated payment: {pay}"); 
         }
 
         public static void CalculatingIncome()

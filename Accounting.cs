@@ -1,19 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 
 namespace ScooterRental
 {
     public class Accounting
     {
-
         public List<Payment> Payments = new List<Payment>();
         public IScooterService Service = new ScooterService("City scooters");
-        public List<Scooter> scooters;
-
+        
         public Accounting(List<Payment> payments)
         {
             Payments = payments;
@@ -24,6 +20,8 @@ namespace ScooterRental
             Scooter scooter = Service.GetScooterById(id);
             decimal pricePerMinute = scooter.PricePerMinute;
             Payment payment = new Payment(id, time, pricePerMinute);
+            if (Payments == null)
+                Payments = new List<Payment>();
             Payments.Add(payment);
         }
 
@@ -33,7 +31,7 @@ namespace ScooterRental
             payment.EndTime = time;
             decimal pay = CalculatePay(payment.StartTime, payment.EndTime, payment.PricePerMinute);
             payment.SumPay = pay;
-            return pay;
+            return payment.SumPay;
         }
 
         public decimal GetPay(string id)
