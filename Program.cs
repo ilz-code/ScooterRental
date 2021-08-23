@@ -12,53 +12,56 @@ namespace ScooterRental
 
         public static void Main(string[] args)
         {
-            MakeChoise();
+            Service.AddScooter("From file", 1);
+            Payments = Account.GetPayments();
+            MakeChoice();
         }
 
-        public static void MakeChoise()
+        public static void MakeChoice()
+        {
+            string choice;
+            do
             {
-                string choise;
-                do
-                {
-                    Console.WriteLine("\n Choose what to do:" +
-                                      "\n Add scooter - 1" +
-                                      "\n Remove scooter - 2" +
-                                      "\n Rent scooter - 3" +
-                                      "\n Return scooter - 4" +
-                                      "\n Calculate income - 5" +
-                                      "\n End work - 0");
-                    choise = Console.ReadLine();
+                Console.WriteLine("\n Choose what to do:" +
+                                  "\n Add scooter - 1" +
+                                  "\n Remove scooter - 2" +
+                                  "\n Rent scooter - 3" +
+                                  "\n Return scooter - 4" +
+                                  "\n Calculate income - 5" +
+                                  "\n End work - 0");
+                choice = Console.ReadLine();
 
-                    switch (choise)
-                    {
-                        case "1":
-                            AddingScooter();
-                            break;
-                        case "2":
-                            RemovingScooter();
-                            break;
-                        case "3":
-                            RentingScooter();
-                            break;
-                        case "4":
-                            ReturningScooter();
-                            break;
-                        case "5":
-                            CalculatingIncome();
-                            break;
-                        case "0":
-                            return;
-                    }
-                } while (choise != "0");
-            }
-        
+                switch (choice)
+                {
+                    case "1":
+                        AddingScooter();
+                        break;
+                    case "2":
+                        RemovingScooter();
+                        break;
+                    case "3":
+                        RentingScooter();
+                        break;
+                    case "4":
+                        ReturningScooter();
+                        break;
+                    case "5":
+                        CalculatingIncome();
+                        break;
+                    case "0":
+                        EndWork();
+                        return;
+                }
+            } while (choice != "0");
+        }
 
         public static void AddingScooter()
         {
             Console.WriteLine("Enter ID");
             string id = Console.ReadLine();
             Console.WriteLine("Enter price per minute");
-            decimal pricePerMinute = Convert.ToDecimal(Console.ReadLine());
+            decimal pricePerMinute = 0;
+            pricePerMinute = Convert.ToDecimal(Console.ReadLine());
             Service.AddScooter(id, pricePerMinute);
         }
 
@@ -86,8 +89,8 @@ namespace ScooterRental
             Console.WriteLine("Enter time (yyyy-mm-dd hh:mm:ss)");
             DateTime time = DateTime.Parse(Console.ReadLine());
             Account.EndRenting(id, time);
-            decimal pay = Rental.EndRent(id); 
-            Console.WriteLine($"\n Calculated payment: {pay}"); 
+            decimal pay = Rental.EndRent(id);
+            Console.WriteLine($"\n Calculated payment: {pay}");
         }
 
         public static void CalculatingIncome()
@@ -97,6 +100,13 @@ namespace ScooterRental
             Console.WriteLine("Include not completed rentals? (y/n)");
             bool notCompletedRentals = (Console.ReadLine() == "y") ? true : false;
             Console.WriteLine($"\n Calculated income: {Rental.CalculateIncome(year, notCompletedRentals)}");
+        }
+
+        public static void EndWork()
+        {
+            Account.SavePayments();
+            Service.AddScooter("Save to file", 1);
+            Console.WriteLine("Goodbye!");
         }
     }
 }

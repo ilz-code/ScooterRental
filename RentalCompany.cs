@@ -1,4 +1,5 @@
 ﻿using System;
+using ScooterRental.Exceptions;
 
 namespace ScooterRental
 {
@@ -20,7 +21,7 @@ namespace ScooterRental
         {
             Scooter scooter = Service.GetScooterById(id);
             if (scooter.IsRented)
-                throw new Exception("Scooter is rented.");
+                throw new ScooterIsNotAvailableException();
             else
                 scooter.IsRented = true;
         }

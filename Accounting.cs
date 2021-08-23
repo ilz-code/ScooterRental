@@ -2,19 +2,37 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using Newtonsoft.Json;
 
 namespace ScooterRental
 {
     public class Accounting
     {
-        public List<Payment> Payments = new List<Payment>();
+        public List<Payment> Payments; 
         public IScooterService Service = new ScooterService("City scooters");
-        
+
         public Accounting(List<Payment> payments)
         {
             Payments = payments;
         }
 
+        public List<Payment> GetPayments()
+        {
+            if (Payments == null)
+            {
+                if (File.Exists(@"..\..\PaymentsList.txt"))
+                {
+                    var pm = File.ReadAllText(@"..\..\PaymentsList.txt");
+                    Payments = JsonConvert.DeserializeObject<List<Payment>>(pm);
+                }
+            }
+
+            if (Payments == null)
+                Payments = PaymentsFromFile("Payments");
+
+            return Payments;
+        }
+        
         public void StartRenting(string id, DateTime time)
         {
             Scooter scooter = Service.GetScooterById(id);
@@ -25,7 +43,7 @@ namespace ScooterRental
             Payments.Add(payment);
         }
 
-        public decimal EndRenting(string id, DateTime time) 
+        public decimal EndRenting(string id, DateTime time)
         {
             Payment payment = Payments.Find(p => p.Id == id);
             payment.EndTime = time;
@@ -42,6 +60,7 @@ namespace ScooterRental
 
         public decimal CalculatingIncome(int? year, bool includeNotCompletedRentals)
         {
+            GetPayments();
             decimal income = 0;
 
             if (includeNotCompletedRentals == false)
@@ -125,7 +144,7 @@ namespace ScooterRental
             List<Payment> payments = new List<Payment>();
             var text = File.ReadAllText($"..\\..\\{fileName}.txt");
             string[] lines = text.Split('\n');
-            for (int i = 0; i <3 ; i++) //lines.Length
+            for (int i = 0; i < 3; i++) //lines.Length
             {
                 string[] words = lines[i].Split(' ');
                 DateTime time = DateTime.Parse(words[1] + " " + words[2]);
@@ -135,6 +154,13 @@ namespace ScooterRental
 
             return payments;
         }
+
+        public void SavePayments()
+        {
+            var paymentsList = JsonConvert.SerializeObject(Payments);
+            File.WriteAllText(@"..\..\PaymentsList.txt", paymentsList);
+        }
+
     }
 }
 

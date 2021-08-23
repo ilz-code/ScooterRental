@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Newtonsoft.Json;
+using ScooterRental.Exceptions;
 
 
 namespace ScooterRental
@@ -27,6 +29,16 @@ namespace ScooterRental
                     scooters.Add(new Scooter(words[0], Convert.ToDecimal(words[1])));
                 }
             }
+            else if (id == "From file")
+            {
+                var sc = File.ReadAllText(@"..\..\ScootersList.txt");
+                scooters = JsonConvert.DeserializeObject<List<Scooter>>(sc);
+            }
+            else if (id == "Save to file")
+            {
+                var scootersList = JsonConvert.SerializeObject(scooters);
+                File.WriteAllText(@"..\..\ScootersList.txt", scootersList);
+            }
             else
             {
                 Scooter scooter = new Scooter(id, pricePerMinute);
@@ -39,7 +51,7 @@ namespace ScooterRental
             Scooter scooter = GetScooterById(id);
 
             if (scooter.IsRented)
-                throw new Exception("Scooter is rented.");
+                throw new ScooterIsNotAvailableException();
             else
                 scooters.Remove(scooter);
         }
