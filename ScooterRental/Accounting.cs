@@ -45,12 +45,16 @@ namespace ScooterRental
 
         public decimal EndRenting(string id, DateTime time)
         {
-            Payment payment = Payments.Find(p => p.Id == id);
+            Payment payment = null;
+            foreach(Payment p in Payments)
+                if (p.Id == id)
+                    payment = p;
             payment.EndTime = time;
             if (time < payment.StartTime)
                 throw new IncorrectEndTimeException();
             decimal pay = CalculatePay(payment.StartTime, payment.EndTime, payment.PricePerMinute);
             payment.SumPay = pay;
+            payment.Id = "completed";
             return payment.SumPay;
         }
 
@@ -82,7 +86,7 @@ namespace ScooterRental
                 }
             }
 
-            else //if (includeNotCompletedRentals == true)
+            else
             {
                 if (year == null)
                 {
