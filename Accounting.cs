@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using Newtonsoft.Json;
+using ScooterRental.Exceptions;
 
 namespace ScooterRental
 {
@@ -25,10 +26,11 @@ namespace ScooterRental
                     var pm = File.ReadAllText(@"..\..\PaymentsList.txt");
                     Payments = JsonConvert.DeserializeObject<List<Payment>>(pm);
                 }
+                else
+                {
+                    Payments = PaymentsFromFile("Payments");
+                }
             }
-
-            if (Payments == null)
-                Payments = PaymentsFromFile("Payments");
 
             return Payments;
         }
@@ -38,8 +40,6 @@ namespace ScooterRental
             Scooter scooter = Service.GetScooterById(id);
             decimal pricePerMinute = scooter.PricePerMinute;
             Payment payment = new Payment(id, time, pricePerMinute);
-            if (Payments == null)
-                Payments = new List<Payment>();
             Payments.Add(payment);
         }
 
@@ -47,6 +47,8 @@ namespace ScooterRental
         {
             Payment payment = Payments.Find(p => p.Id == id);
             payment.EndTime = time;
+            if (time < payment.StartTime)
+                throw new IncorrectEndTimeException();
             decimal pay = CalculatePay(payment.StartTime, payment.EndTime, payment.PricePerMinute);
             payment.SumPay = pay;
             return payment.SumPay;

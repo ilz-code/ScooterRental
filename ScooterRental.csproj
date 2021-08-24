@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Accounting.cs" />
+    <Compile Include="Exceptions\IncorrectEndTimeException.cs" />
     <Compile Include="Exceptions\ScooterIsNotAvailableException.cs" />
     <Compile Include="IRentalCompany.cs" />
     <Compile Include="IScooterService.cs" />

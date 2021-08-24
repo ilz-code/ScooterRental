@@ -63,16 +63,9 @@ namespace ScooterRental
 
         public Scooter GetScooterById(string scooterId)
         {
-            Scooter scooter;
-            try
-            {
-                scooter = scooters.Find(sc => sc.Id == scooterId);
-            }
-            catch (ScooterIsNotAvailableException e)
-            {
-                Console.WriteLine(e.Message);
-                throw;
-            }
+            Scooter scooter = scooters.Find(sc => sc.Id == scooterId);
+            if (scooter == null)
+                throw new ScooterIsNotAvailableException();
             
             return scooter;
         }
