@@ -44,7 +44,7 @@ namespace ScooterRental
             Payments.Add(payment);
         }
 
-        public decimal EndRenting(string id, DateTime time)
+        public void EndRenting(string id, DateTime time)
         {
             Payment payment = null;
             foreach(Payment p in Payments)
@@ -55,13 +55,15 @@ namespace ScooterRental
                 throw new IncorrectEndTimeException();
             decimal pay = CalculatePay(payment.StartTime, payment.EndTime, payment.PricePerMinute);
             payment.SumPay = pay;
-            payment.Id = "completed";
-            return payment.SumPay;
         }
 
         public decimal GetPay(string id)
         {
-            Payment payment = Payments.Find(p => p.Id == id);
+            Payment payment = null;
+            foreach (Payment p in Payments)
+                if (p.Id == id)
+                    payment = p;
+            Payments.Find(p => p.Id == id);
             return payment.SumPay;
         }
 

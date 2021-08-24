@@ -108,7 +108,8 @@ namespace ScooterRentalTests
             Payments.AddRange(Account.PaymentsFromFile("Payments"));
             DateTime timeEnd = DateTime.Parse("2020-08-14 17:00:00");
             //Act
-            decimal result = Account.EndRenting("1", timeEnd);
+            Account.EndRenting("1", timeEnd);
+            decimal result = Account.GetPay("1");
             //Assert
             decimal expect = 54.40m;
             Assert.AreEqual(expect, result);
@@ -127,15 +128,20 @@ namespace ScooterRentalTests
             //Arrange
             decimal expected = Convert.ToDecimal(expect);
             Payments.AddRange(Account.PaymentsFromFile("Payments"));
-            Payment payment1 = Payments.Find(p => p.Id == "1");
+            DateTime time1 = DateTime.Parse("2020-08-11 16:00:00");
+            Payment payment1 = new Payment("1", time1, 0.03m);
             DateTime time2 = DateTime.Parse("2020-08-14 17:00:00");
             payment1.EndTime = time2;
-            payment1.SumPay = Account.EndRenting(payment1.Id, time2);
-            Payment payment2 = Payments.Find(p => p.Id == "2");
+            Account.EndRenting(payment1.Id, time2);
+            payment1.SumPay = Account.GetPay(payment1.Id);
+            DateTime time3 = DateTime.Parse("2020-12-29 16:00:00");
+            Payment payment2 = new Payment("2", time3, 0.03m);
             DateTime time4 = DateTime.Parse("2021-01-01 08:00:00");
             payment2.EndTime = time4;
-            payment2.SumPay = Account.EndRenting(payment2.Id, time4);
-            Payment payment3 = Payments.Find(p => p.Id == "3");
+            Account.EndRenting(payment2.Id, time4);
+            payment2.SumPay = Account.GetPay(payment2.Id);
+            DateTime time5 = DateTime.Parse("2021-12-30 16:00:00");
+            Payment payment3 = new Payment("3", time5, 0.03m);
             //Act
             decimal result = Rental.CalculateIncome( year, notCompleted);
             //Assert
