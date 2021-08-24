@@ -40,6 +40,7 @@ namespace ScooterRental
             Scooter scooter = Service.GetScooterById(id);
             decimal pricePerMinute = scooter.PricePerMinute;
             Payment payment = new Payment(id, time, pricePerMinute);
+            Console.WriteLine($"Price per minute: {pricePerMinute}");
             Payments.Add(payment);
         }
 
