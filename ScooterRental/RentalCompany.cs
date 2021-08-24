@@ -29,6 +29,10 @@ namespace ScooterRental
         public decimal EndRent(string id)
         {
             Scooter scooter = Service.GetScooterById(id);
+            if (scooter == null)
+                throw new ScooterIsNotAvailableException("Scooter is not found");
+            if (scooter.IsRented == false)
+                throw new ScooterIsNotAvailableException("This scooter is not rented out");
             scooter.IsRented = false;
             decimal pay = Account.GetPay(id);
             return pay;
