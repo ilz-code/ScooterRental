@@ -4,7 +4,6 @@ using System.IO;
 using Newtonsoft.Json;
 using ScooterRental.Exceptions;
 
-
 namespace ScooterRental
 {
     public class ScooterService : IScooterService

@@ -63,13 +63,14 @@ namespace ScooterRental
             foreach (Payment p in Payments)
                 if (p.Id == id)
                     payment = p;
-            Payments.Find(p => p.Id == id);
+            if (payment == null)
+                throw new PaymentNotFoundException();
+
             return payment.SumPay;
         }
 
         public decimal CalculatingIncome(int? year, bool includeNotCompletedRentals)
         {
-            GetPayments();
             decimal income = 0;
 
             if (includeNotCompletedRentals == false)

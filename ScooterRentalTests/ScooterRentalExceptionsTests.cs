@@ -80,5 +80,14 @@ namespace ScooterRentalTests
             //Assert
             Assert.ThrowsException<IncorrectEndTimeException>(() => Account.EndRenting("5", timeEnd));
         }
+
+        [TestMethod]
+        public void GetPay_NonExistingPayment_PaymentNotFoundException()
+        {
+            //Arrange
+            Account.GetPayments();
+            //Assert
+            Assert.ThrowsException<PaymentNotFoundException>(() => Account.GetPay("33"));
+        }
     }
 }

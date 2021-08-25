@@ -1,5 +1,4 @@
-﻿using System;
-using ScooterRental.Exceptions;
+﻿using ScooterRental.Exceptions;
 
 namespace ScooterRental
 {

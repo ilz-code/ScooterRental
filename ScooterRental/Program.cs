@@ -15,6 +15,8 @@ namespace ScooterRental
             Service.AddScooter("From file", 1);
             Payments = Account.GetPayments();
             MakeChoice();
+            Account.SavePayments();
+            Service.AddScooter("Save to file", 1);
         }
 
         public static void MakeChoice()
@@ -48,9 +50,6 @@ namespace ScooterRental
                     case "5":
                         CalculatingIncome();
                         break;
-                    case "0":
-                        EndWork();
-                        return;
                 }
             } while (choice != "0");
         }
@@ -60,8 +59,8 @@ namespace ScooterRental
             Console.WriteLine("Enter ID");
             string id = Console.ReadLine();
             Console.WriteLine("Enter price per minute");
-            decimal pricePerMinute = 0;
-            pricePerMinute = Convert.ToDecimal(Console.ReadLine());
+            //decimal pricePerMinute = 0;
+            decimal pricePerMinute = Convert.ToDecimal(Console.ReadLine());
             Service.AddScooter(id, pricePerMinute);
         }
 
@@ -100,13 +99,6 @@ namespace ScooterRental
             Console.WriteLine("Include not completed rentals? (y/n)");
             bool notCompletedRentals = (Console.ReadLine() == "y") ? true : false;
             Console.WriteLine($"\n Calculated income: {Rental.CalculateIncome(year, notCompletedRentals)}");
-        }
-
-        public static void EndWork()
-        {
-            Account.SavePayments();
-            Service.AddScooter("Save to file", 1);
-            Console.WriteLine("Goodbye!");
         }
     }
 }
