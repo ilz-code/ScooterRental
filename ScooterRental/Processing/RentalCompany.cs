@@ -1,7 +1,8 @@
-﻿using System;
-using ScooterRental.Exceptions;
+﻿using ScooterRental.Exceptions;
+using ScooterRental.Interfaces;
+using ScooterRental.Objects;
 
-namespace ScooterRental
+namespace ScooterRental.Processing
 {
     public class RentalCompany : IRentalCompany
     {

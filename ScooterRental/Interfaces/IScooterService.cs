@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using ScooterRental.Objects;
 
-namespace ScooterRental
+namespace ScooterRental.Interfaces
 {
     public interface IScooterService
     {

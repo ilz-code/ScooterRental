@@ -1,53 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.IO;
-using Newtonsoft.Json;
 using ScooterRental.Exceptions;
+using ScooterRental.Interfaces;
+using ScooterRental.Objects;
 
-namespace ScooterRental
+namespace ScooterRental.Processing
 {
-    public class Accounting
+    public class Accounting : IAccounting
     {
-        public List<Payment> Payments; 
-        public IScooterService Service = new ScooterService("City scooters");
+        public List<Payment> Payments;
 
         public Accounting(List<Payment> payments)
         {
             Payments = payments;
         }
 
-        public List<Payment> GetPayments()
+        public void StartRenting(string id, DateTime time, decimal pricePerMinute)
         {
-            if (Payments == null)
-            {
-                if (File.Exists(@"..\..\PaymentsList.txt"))
-                {
-                    var pm = File.ReadAllText(@"..\..\PaymentsList.txt");
-                    Payments = JsonConvert.DeserializeObject<List<Payment>>(pm);
-                }
-                else
-                {
-                    Payments = PaymentsFromFile("Payments");
-                }
-            }
-
-            return Payments;
-        }
-        
-        public void StartRenting(string id, DateTime time)
-        {
-            Scooter scooter = Service.GetScooterById(id);
-            decimal pricePerMinute = scooter.PricePerMinute;
             Payment payment = new Payment(id, time, pricePerMinute);
             Console.WriteLine($"Price per minute: {pricePerMinute}");
             Payments.Add(payment);
         }
 
-        public decimal EndRenting(string id, DateTime time)
+        public void EndRenting(string id, DateTime time)
         {
             Payment payment = null;
-            foreach(Payment p in Payments)
+            foreach (Payment p in Payments)
                 if (p.Id == id)
                     payment = p;
             payment.EndTime = time;
@@ -55,19 +34,22 @@ namespace ScooterRental
                 throw new IncorrectEndTimeException();
             decimal pay = CalculatePay(payment.StartTime, payment.EndTime, payment.PricePerMinute);
             payment.SumPay = pay;
-            payment.Id = "completed";
-            return payment.SumPay;
         }
 
         public decimal GetPay(string id)
         {
-            Payment payment = Payments.Find(p => p.Id == id);
+            Payment payment = null;
+            foreach (Payment p in Payments)
+                if (p.Id == id)
+                    payment = p;
+            if (payment == null)
+                throw new PaymentNotFoundException();
+
             return payment.SumPay;
         }
 
         public decimal CalculatingIncome(int? year, bool includeNotCompletedRentals)
         {
-            GetPayments();
             decimal income = 0;
 
             if (includeNotCompletedRentals == false)
@@ -124,7 +106,7 @@ namespace ScooterRental
             return income;
         }
 
-        public decimal CalculatePay(DateTime startTime, DateTime endTime, decimal pricePerMinute)
+        private decimal CalculatePay(DateTime startTime, DateTime endTime, decimal pricePerMinute)
         {
             decimal minutes = (decimal)(endTime - startTime).TotalMinutes;
             decimal pay = Math.Round(minutes * pricePerMinute, 2);
@@ -145,29 +127,6 @@ namespace ScooterRental
 
             return pay;
         }
-
-        public List<Payment> PaymentsFromFile(string fileName)
-        {
-            List<Payment> payments = new List<Payment>();
-            var text = File.ReadAllText($"..\\..\\{fileName}.txt");
-            string[] lines = text.Split('\n');
-            for (int i = 0; i < 3; i++) //lines.Length
-            {
-                string[] words = lines[i].Split(' ');
-                DateTime time = DateTime.Parse(words[1] + " " + words[2]);
-                decimal price = Convert.ToDecimal(words[3]);
-                payments.Add(new Payment(words[0], time, price));
-            }
-
-            return payments;
-        }
-
-        public void SavePayments()
-        {
-            var paymentsList = JsonConvert.SerializeObject(Payments);
-            File.WriteAllText(@"..\..\PaymentsList.txt", paymentsList);
-        }
-
     }
 }
 

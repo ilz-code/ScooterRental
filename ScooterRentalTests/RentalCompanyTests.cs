@@ -1,35 +1,62 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ScooterRental;
 using ScooterRental.Exceptions;
+using ScooterRental.Interfaces;
+using ScooterRental.Objects;
+using ScooterRental.Processing;
 
 namespace ScooterRentalTests
 {
     [TestClass]
-    public class ScooterRentalExceptionsTests
+    public class RentalCompanyTests
     {
         public IScooterService Service;
         public IRentalCompany Rental;
         public Accounting Account;
         public List<Payment> Payments;
+        public List<Scooter> Scooters;
+        public ReadingAndSavingScootersAndPayments ReadAndSaveFiles = new ReadingAndSavingScootersAndPayments();
 
-        public ScooterRentalExceptionsTests()
+        public RentalCompanyTests()
         {
             Payments = new List<Payment>();
+            Scooters = ReadAndSaveFiles.ReadScootersFromFile();
             Account = new Accounting(Payments);
-            Service = new ScooterService("City scooters");
+            Service = new ScooterService("City scooters", Scooters);
             Rental = new RentalCompany("City scooters", Service, Account);
         }
 
         [TestMethod]
-        public void RemoveScooter_IsRented_ScooterIsNotAvailableException()
+        public void StartRent_IsRented()
+        {
+            Service.AddScooter("Scooters", 0.01m);
+            Rental.StartRent("3");
+            bool result = Service.GetScooterById("3").IsRented;
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void EndRent_EndingRent_IsRentedFalse()
         {
             //Arrange
-            Service.AddScooter("scooters", 1);
+            Scooters.Clear();
+            Service.AddScooter("2", 0.05m);
+            Scooter scooter = Service.GetScooterById("2");
+            scooter.IsRented = false;
             Rental.StartRent("2");
+            DateTime timeStart = DateTime.Parse("2020-08-13 08:00:00");
+            Account.StartRenting("2", timeStart, 0.05m);
+            DateTime timeEnd = DateTime.Parse("2020-08-14 17:00:00");
+            Account.EndRenting("2", timeEnd);
+            //Act
+            Rental.EndRent("2");
+            bool result = Service.GetScooterById("2").IsRented;
             //Assert
-            Assert.ThrowsException<ScooterIsNotAvailableException>(() => Service.RemoveScooter("2"));
+            Assert.IsFalse(result);
         }
 
         [TestMethod]
@@ -40,13 +67,6 @@ namespace ScooterRentalTests
             Rental.StartRent("5");
             //Assert
             Assert.ThrowsException<ScooterIsNotAvailableException>(() => Rental.StartRent("5"));
-        }
-
-        [TestMethod]
-        public void GetScooterById_NonExistingId_ScooterIsNotAvailableException()
-        {
-            Service.AddScooter("scooters", 1);
-            Assert.ThrowsException<ScooterIsNotAvailableException>(() => Service.GetScooterById("22"));
         }
 
         [TestMethod]
@@ -67,18 +87,6 @@ namespace ScooterRentalTests
             scooter.IsRented = false;
             //Assert
             Assert.ThrowsException<ScooterIsNotAvailableException>(() => Rental.EndRent("3"));
-        }
-
-        [TestMethod]
-        public void EndRenting_IncorrectEndTime_Exception()
-        {
-            //Arrange
-            Service.AddScooter("5", 0.04m);
-            DateTime timeStart = DateTime.Parse("2020-09-09 09:00:00");
-            Account.StartRenting("5", timeStart);
-            DateTime timeEnd = DateTime.Parse("2020-09-08 17:00:00");
-            //Assert
-            Assert.ThrowsException<IncorrectEndTimeException>(() => Account.EndRenting("5", timeEnd));
         }
     }
 }

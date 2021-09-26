@@ -1,20 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using ScooterRental.Interfaces;
+using ScooterRental.Objects;
+using ScooterRental.Processing;
 
 namespace ScooterRental
 {
     class Program
     {
-        public static IScooterService Service = new ScooterService("City scooters");
-        public static List<Payment> Payments;
+        public static ReadingAndSavingScootersAndPayments ReadAndSaveFiles = new ReadingAndSavingScootersAndPayments();
+        public static List<Scooter> Scooters = ReadAndSaveFiles.ReadScootersFromFile();
+        public static IScooterService Service = new ScooterService("City scooters", Scooters);
+        public static List<Payment> Payments = ReadAndSaveFiles.ReadPaymentsFromFile();
         public static Accounting Account = new Accounting(Payments);
         public static IRentalCompany Rental = new RentalCompany("City scooters", Service, Account);
+        
 
         public static void Main(string[] args)
         {
-            Service.AddScooter("From file", 1);
-            Payments = Account.GetPayments();
             MakeChoice();
+            ReadAndSaveFiles.SaveScooters();
+            ReadAndSaveFiles.SavePayments();
         }
 
         public static void MakeChoice()
@@ -48,9 +54,6 @@ namespace ScooterRental
                     case "5":
                         CalculatingIncome();
                         break;
-                    case "0":
-                        EndWork();
-                        return;
                 }
             } while (choice != "0");
         }
@@ -60,8 +63,7 @@ namespace ScooterRental
             Console.WriteLine("Enter ID");
             string id = Console.ReadLine();
             Console.WriteLine("Enter price per minute");
-            decimal pricePerMinute = 0;
-            pricePerMinute = Convert.ToDecimal(Console.ReadLine());
+            decimal pricePerMinute = Convert.ToDecimal(Console.ReadLine());
             Service.AddScooter(id, pricePerMinute);
         }
 
@@ -78,7 +80,9 @@ namespace ScooterRental
             string id = Console.ReadLine();
             Console.WriteLine("Enter time (yyyy-mm-dd hh:mm:ss)");
             DateTime time = DateTime.Parse(Console.ReadLine());
-            Account.StartRenting(id, time);
+            Scooter scooter = Service.GetScooterById(id);
+            decimal pricePerMinute = scooter.PricePerMinute;
+            Account.StartRenting(id, time, pricePerMinute);
             Rental.StartRent(id);
         }
 
@@ -100,13 +104,6 @@ namespace ScooterRental
             Console.WriteLine("Include not completed rentals? (y/n)");
             bool notCompletedRentals = (Console.ReadLine() == "y") ? true : false;
             Console.WriteLine($"\n Calculated income: {Rental.CalculateIncome(year, notCompletedRentals)}");
-        }
-
-        public static void EndWork()
-        {
-            Account.SavePayments();
-            Service.AddScooter("Save to file", 1);
-            Console.WriteLine("Goodbye!");
         }
     }
 }

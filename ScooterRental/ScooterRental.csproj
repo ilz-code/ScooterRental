@@ -46,17 +46,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Accounting.cs" />
+    <Compile Include="Exceptions\DoubleScooterIdException.cs" />
+    <Compile Include="Exceptions\NegativePriceException.cs" />
+    <Compile Include="Interfaces\IAccounting.cs" />
+    <Compile Include="Processing\Accounting.cs" />
     <Compile Include="Exceptions\IncorrectEndTimeException.cs" />
+    <Compile Include="Exceptions\PaymentNotFoundException.cs" />
     <Compile Include="Exceptions\ScooterIsNotAvailableException.cs" />
-    <Compile Include="IRentalCompany.cs" />
-    <Compile Include="IScooterService.cs" />
-    <Compile Include="Payment.cs" />
+    <Compile Include="Interfaces\IScooterService.cs" />
+    <Compile Include="Interfaces\IRentalCompany.cs" />
+    <Compile Include="Objects\Payment.cs" />
+    <Compile Include="Processing\ReadingAndSavingScootersAndPayments.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RentalCompany.cs" />
-    <Compile Include="Scooter.cs" />
-    <Compile Include="ScooterService.cs" />
+    <Compile Include="Processing\RentalCompany.cs" />
+    <Compile Include="Objects\Scooter.cs" />
+    <Compile Include="Processing\ScooterService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
